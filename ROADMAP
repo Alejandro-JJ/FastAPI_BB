@@ -7,6 +7,10 @@ Days 1, 2:
 	docker run -d --name redis-server -p 6379:6379 redis:alpine
 	starts in the background in port 6379
 - installed celery for running processes in the background
+
+can be run with 
+celery -A backend.tasks worker --loglevel=info --concurrency=4
+
 - tasks.py will run tasks when called
 
 - app can be called with: 
@@ -30,7 +34,7 @@ celery -A tasks.celery_app worker -l info -c 4
 
 - Test out the /run tab with a .json
 {
-  "file_id": "4feb2261-f599-45d1-9947-d857e060fe4c",
+  "file_id": 1,
   "params": {
     "threshold": 0.7,
     "min_size": 500
@@ -38,3 +42,51 @@ celery -A tasks.celery_app worker -l info -c 4
 }
 
 env_01.yml is working with Celery+Redis+FastAPI
+
+###############################
+Day 3: Database with SQLite + User Authentication
+We have three base tables (models): Users, Files and Jobs
+Each link to each other, so that one can do OOP, e.g. my_user.user.file
+They inherit a basic model from database.py
+For autentication we use FastAPIUsers, which can handle:
+
+-User registration
+-User login
+-Password hashing
+-JWT tokens (secure login tokens)
+
+Upon error "database is blocked", delete the current database in backend/database.db
+
+FastAPI compatibility is hell, spent a day debugging.
+We go for JWT Authentication.
+
+* User registers -> is in db
+* User logins -> i get an access token response
+* User can do actions with token
+* e.g. POST/upload, auth. header should include ¨Bearer TOKEN¨
+* run segmentation dummy with:
+{
+  "file_id": 2,
+  "params": {
+    "threshold": 0.7,
+    "min_size": 500
+  },
+  "job_id": 
+}
+k
+################################
+Day 4: simple skeleton working
+setup:
+1.- conda activate EnvBB
+2.- docker run -d --name redis-server -p 6379:6379 redis:alpine (SEPARATE TERMINAL)
+3.- celery -A tasks.celery_app worker -l info -c 4 (SEPARATE TERMINAL)
+4.- uvicorn main:appv (SEPARATE TERMINAL)
+5.- http://localhost:8000/docs
+
+Now, user can register, login, upload (automated task) and run segmentation (dummy transformation)
+
+
+
+
+
+
